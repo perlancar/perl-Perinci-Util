@@ -111,8 +111,7 @@ sub get_package_meta_accessor {
     my %args = @_;
 
     my $pkg = $args{package};
-    my $def = $args{default_class} //
-        'Perinci::Access::InProcess::MetaAccessor';
+    my $def = $args{default_class} // 'Perinci::MetaAccessor::Default';
 
     no strict 'refs';
     my $ma   = ${ "$pkg\::PERINCI_META_ACCESSOR" } // $def;
