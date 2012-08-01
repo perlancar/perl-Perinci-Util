@@ -24,6 +24,7 @@ sub get_all_meta {
 sub set_meta {
     my ($class, $req, $meta) = @_;
     no strict 'refs';
+    my $key = $req->{-leaf} || ':package';
     ${ $req->{-module} . "::SPEC" }{$key} = $meta;
 }
 
