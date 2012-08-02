@@ -6,7 +6,7 @@ use Moo::Role;
 # VERSION
 
 requires 'get_meta';
-requires 'get_all_meta';
+requires 'get_all_metas';
 requires 'set_meta';
 
 1;

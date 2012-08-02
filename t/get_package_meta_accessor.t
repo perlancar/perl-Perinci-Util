@@ -30,8 +30,8 @@ subtest 'default class' => sub {
     is($res->{summary}, "Tidur, defaultnya 10 detik",
        "get_meta delay");
 
-    $res = $ma->get_all_meta("Perinci::Examples");
-    ok($res->{":package"} && $res->{delay}, "get_all_meta");
+    $res = $ma->get_all_metas("Perinci::Examples");
+    ok($res->{":package"} && $res->{delay}, "get_all_metas");
 
     $ma->set_meta("Perinci::Examples", "foo", {v=>1.1, summary=>"foo"});
     $res = $ma->get_meta("Perinci::Examples", "foo");

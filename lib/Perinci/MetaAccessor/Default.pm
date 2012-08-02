@@ -14,7 +14,7 @@ sub get_meta {
     ${ $package . "::SPEC" }{$key};
 }
 
-sub get_all_meta {
+sub get_all_metas {
     my ($class, $package) = @_;
     no strict 'refs';
     \%{ $package . "::SPEC" };
