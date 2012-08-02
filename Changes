@@ -1,5 +1,13 @@
 Revision history for Perinci-Util
 
+0.26     2012-08-02 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - MetaAccessor: Rename method get_all_meta() to get_all_metas()
+           (English)
+
+
 0.25     2012-08-01 (SHARYANTO)
 
          - Bump version to be accepted by PAUSE.
