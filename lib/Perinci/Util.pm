@@ -198,8 +198,8 @@ C<Perinci::MetaAccessor::Default>).
 
 =head2 get_step_spec($name, \%steps) => HASHREF
 
-Step is the unit of work in undoable/transactional functions described in
-L<Perinci::Sub::Gen::Undoable>.
+Step is the unit of subroutine's work in defined by
+L<Rinci::function::Transaction>.
 
 C<%steps> is optional. Step C<$name> will first be searched in C<%steps>'s keys.
 If found and value is a hashref, that stepspec is returned. If found but value
