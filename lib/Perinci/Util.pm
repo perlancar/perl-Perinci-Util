@@ -1,5 +1,10 @@
 package Perinci::Util;
 
+use 5.010;
+use strict;
+use warnings;
+use Log::Any '$log';
+
 use SHARYANTO::Package::Util qw(package_exists);
 
 require Exporter;
@@ -9,6 +14,7 @@ our @EXPORT_OK = qw(
                        declare_function_feature
                        declare_function_dep
                        get_package_meta_accessor
+                       get_step_spec
                );
 
 # VERSION
@@ -139,12 +145,68 @@ sub get_package_meta_accessor {
     [200, "OK", $ma];
 }
 
+sub get_step_spec {
+    my ($name, $steps) = @_;
+    $steps //= {};
+
+    my $spec = $steps->{$name};
+    if (defined($spec) && !ref($spec)) {
+        $spec = $steps->{$spec};
+    } # currently only allows 1 level of aliasing
+    unless (defined $spec) {
+        # attempt to load step specification from a module first
+        my $m = "Perinci::Sub::Step::$name";
+        eval {
+            unless (package_exists($m)) {
+                my $mp = $m;
+                $mp =~ s!::!/!g;
+                $mp .= ".pm";
+                $log->tracef("Trying to load step spec from %s ...",$m);
+                my $rres = require $mp;
+                $log->tracef("Loaded %s", $m) if $rres;
+            }
+            no strict 'refs';
+            $spec = *{"$m\::spec"}{CODE}->();
+        };
+        $log->trace("Can't load step spec from $m: $@") if $@;
+    }
+    $spec;
+}
+
 1;
 # ABSTRACT: Utility routines
 
 =head1 DESCRIPTION
 
 This is a temporary module containing utility routines.
+
+It should be split once it's rather big.
+
+
+=head1 FUNCTIONS
+
+=head2 declare_property
+
+=head2 declare_function_dep
+
+=head2 declare_function_feature
+
+=head2 get_package_meta_accessor(%args)
+
+Arguments: C<package>, C<default_class> (optional, defaults to
+C<Perinci::MetaAccessor::Default>).
+
+=head2 get_step_spec($name, \%steps) => HASHREF
+
+Step is the unit of work in undoable/transactional functions described in
+L<Perinci::Sub::Gen::Undoable>.
+
+C<%steps> is optional. Step C<$name> will first be searched in C<%steps>'s keys.
+If found and value is a hashref, that stepspec is returned. If found but value
+is a string, it is assumed to be the new step name (an alias) and the new step
+name is searched. If not found in C<%steps> (or C<%steps> if not provided), then
+an attempt is made to load module Perinci::Sub::Step::<$name>; the module should
+contain C<spec()> which if called returns the stepspec.
 
 
 =head1 SEE ALSO
