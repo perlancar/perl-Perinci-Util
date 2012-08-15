@@ -119,6 +119,7 @@ sub get_package_meta_accessor {
     my $def = $args{default_class} // 'Perinci::MetaAccessor::Default';
 
     no strict 'refs';
+    no warnings; # next line, the var only used once, thus warning
     my $ma   = ${ "$pkg\::PERINCI_META_ACCESSOR" } // $def;
     my $ma_p = $ma;
     $ma_p  =~ s!::!/!g;
