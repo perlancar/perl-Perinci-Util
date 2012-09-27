@@ -18,7 +18,7 @@ sub wrapres {
     $ores //= [];
     $ores->[0] //= $ires->[0];
     if ($ores->[1] && $ores->[1] =~ /: \z/) {
-        $ores->[1] .= $ires->[1];
+        $ores->[1] .= "$ires->[0] - $ires->[1]";
     } else {
         $ores->[1] //= $ires->[1];
     }
@@ -94,8 +94,8 @@ Some examples (C<$res> is assumed to be C<< [404, "not found"] >>:
  #                          {error_stack=>[404, "not found"]}]
 
  wrapres([undef, "can't select user: "], $res);
- # when error stack is off: [404, "can't select user: not found"]
- # when error stack is on : [405, "can't select user: not found", undef,
+ # when error stack is off: [404, "can't select user: 404 - not found"]
+ # when error stack is on : [405, "can't select user: 404 - not found", undef,
                              {error_stack=>[404, "not found"]}]
 
  wrapres([500, "can't select user", -1, {foo=>1}], $res);

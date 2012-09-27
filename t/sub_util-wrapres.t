@@ -24,7 +24,7 @@ subtest "without error stack" => sub {
     is_deeply(wrapres(undef, $ires), [404, "not found"]);
     is_deeply(wrapres([500], $ires), [500, "not found"]);
     is_deeply(wrapres([500, "x"], $ires), [500, "x"]);
-    is_deeply(wrapres([500, "x: "], $ires), [500, "x: not found"]);
+    is_deeply(wrapres([500, "x: "], $ires), [500, "x: 404 - not found"]);
     is_deeply(wrapres([500, "x", -1], $ires), [500, "x", -1]);
     is_deeply(wrapres([500, "x", -1, {a=>1, b=>2}], $ires),
               [500, "x", -1, {a=>1, b=>2}]);
