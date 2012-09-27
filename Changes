@@ -1,6 +1,21 @@
 Revision history for Perinci-Util
 
+0.29     2012-09-27 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - wrapres(): Change error stack name in result metadata key from
+           'stack' to 'error_stack'.
+
+         [BUG FIXES]
+
+         - wrapres(): Use inner response's error_stack, don't create a new
+           array.
+
+
 0.28     2012-09-27 (SHARYANTO)
+
+         [ENHANCEMENTS]
 
          - Add module: Perinci::Sub::Util.
 
