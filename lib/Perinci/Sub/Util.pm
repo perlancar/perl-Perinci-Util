@@ -27,16 +27,17 @@ sub wrapres {
     }
 
     # should we build error stack?
-    my $stack = $ENV{PERINCI_ERROR_STACK} || $Perinci::ERROR_STACK;
-    if (!$stack) {
+    my $build_es = $ENV{PERINCI_ERROR_STACK} || $Perinci::ERROR_STACK;
+    if (!$build_es) {
         no strict 'refs';
         my @c = caller(0);
-        $stack ||= ${"$c[0]::PERINCI_ERROR_STACK"};
+        $build_es ||= ${"$c[0]::PERINCI_ERROR_STACK"};
     }
 
-    if ($stack) {
+    if ($build_es) {
         $ores->[3] //= {};
-        unshift @{ $ores->[3]{stack} }, $ires;
+        $ores->[3]{error_stack} //= $ires->[3]{error_stack};
+        unshift @{ $ores->[3]{error_stack} }, $ires;
     }
 
     $ores;
@@ -78,7 +79,7 @@ with C</:\s?\z/>, will append C<$res>'s message.
 If C<$result> is undefined, will use C<$res>'s result.
 
 If C<$meta> is undefined, empty default is used. If instructed to build an error
-stack, will append C<$res> to result metadata's C<stack>.
+stack, will append C<$res> to result metadata's C<error_stack>.
 
 Error stack by default is off. Can be turned on via setting global variable
 C<$Perinci::ERROR_STACK> to true value, or environment variable
@@ -89,17 +90,18 @@ Some examples (C<$res> is assumed to be C<< [404, "not found"] >>:
 
  wrapres(undef, $res);
  # when error stack is off: [404, "not found"]
- # when error stack is on : [404, "not found",undef, {stack=>[404,"not found"]}]
+ # when error stack is on : [404, "not found", undef,
+ #                          {error_stack=>[404, "not found"]}]
 
  wrapres([undef, "can't select user: "], $res);
  # when error stack is off: [404, "can't select user: not found"]
  # when error stack is on : [405, "can't select user: not found", undef,
-                             {stack=>[405,"not found"]}]
+                             {error_stack=>[404, "not found"]}]
 
  wrapres([500, "can't select user", -1, {foo=>1}], $res);
  # when error stack is off: [500, "can't select user"]
  # when error stack is on : [500, "can't select user", -1,
-                             {foo=>1, stack=>[404,"not found"]}]
+                             {foo=>1, error_stack=>[404, "not found"]}]
 
 
 =head1 SEE ALSO
