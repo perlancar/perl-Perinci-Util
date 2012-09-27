@@ -146,7 +146,7 @@ sub get_package_meta_accessor {
 }
 
 1;
-# ABSTRACT: Utility routines
+# ABSTRACT: Perinci utility routines
 
 =head1 DESCRIPTION
 
