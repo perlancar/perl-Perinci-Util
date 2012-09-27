@@ -16,9 +16,13 @@ sub wrapres {
     my ($ores, $ires) = @_;
 
     $ores //= [];
-    $ores->[0] //= $ires->[0];
+    my $istatus;
+    unless (defined $ores->[0]) {
+        $ores->[0] = $ires->[0];
+        $istatus++;
+    }
     if ($ores->[1] && $ores->[1] =~ /: \z/) {
-        $ores->[1] .= "$ires->[0] - $ires->[1]";
+        $ores->[1] .= $istatus ? $ires->[1] : "$ires->[0] - $ires->[1]";
     } else {
         $ores->[1] //= $ires->[1];
     }

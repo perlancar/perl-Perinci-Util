@@ -11,6 +11,7 @@ sub get_meta {
     my ($class, $package, $leaf) = @_;
     my $key = $leaf || ':package';
     no strict 'refs';
+    no warnings;
     ${ $package . "::SPEC" }{$key};
 }
 
