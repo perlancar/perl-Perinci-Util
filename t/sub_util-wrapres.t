@@ -34,24 +34,43 @@ subtest "with error stack" => sub {
     {
         local $ENV{PERINCI_ERROR_STACK} = 1;
         is_deeply(wrapres([500, "x"], $ires),
-                  [500, "x", undef, {stack=>[[404, "not found"]]}]);
+                  [500, "x", undef, {
+                      error_stack=>[[404, "not found", undef, {}]]}]);
         is_deeply(wrapres([500, "x", -1, {a=>1, b=>2}], $ires),
-                  [500, "x", -1, {a=>1, b=>2, stack=>[[404, "not found"]]}]);
+                  [500, "x", -1, {
+                      a=>1, b=>2,
+                      error_stack=>[[404, "not found", undef, {}]]}]);
     }
     {
         no warnings;
         local $Perinci::ERROR_STACK = 1;
         is_deeply(wrapres([500, "x"], $ires),
-                  [500, "x", undef, {stack=>[[404, "not found"]]}]);
+                  [500, "x", undef, {
+                      error_stack=>[[404, "not found", undef, {}]]}]);
         is_deeply(wrapres([500, "x", -1, {a=>1, b=>2}], $ires),
-                  [500, "x", -1, {a=>1, b=>2, stack=>[[404, "not found"]]}]);
+                  [500, "x", -1, {
+                      a=>1, b=>2,
+                      error_stack=>[[404, "not found", undef, {}]]}]);
     }
     {
         no warnings;
         local $Foo::PERINCI_ERROR_STACK = 1;
         is_deeply(Foo::foo(),
-                  [404, "not found", undef, {stack=>[[404, "not found"]]}]);
+                  [404, "not found", undef, {
+                      error_stack=>[[404, "not found", undef, {}]]}]);
     }
+};
+
+subtest "building error stack" => sub {
+    local $Perinci::ERROR_STACK = 1;
+
+    my $res1 = wrapres([2, 2], [1, 1]);
+    my $res2 = wrapres([3, 3], $res1);
+    my $res3 = wrapres([3, 3], $res2);
+
+    my $es = $res3->[3]{error_stack};
+    is_deeply($res3->[3]{error_stack}, $res2->[3]{error_stack},
+              "error stack is not duplicated (3 & 2)");
 };
 
 done_testing();
