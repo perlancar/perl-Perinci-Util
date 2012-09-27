@@ -1,5 +1,13 @@
 Revision history for Perinci-Util
 
+0.30     2012-09-27 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - wrapres(): Append inner response's status too when outer response
+           message ends with /: /.
+
+
 0.29     2012-09-27 (SHARYANTO)
 
          [INCOMPATIBLE CHANGES]
