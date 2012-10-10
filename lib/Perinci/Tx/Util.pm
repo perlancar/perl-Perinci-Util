@@ -28,6 +28,10 @@ sub use_other_actions {
     for (@$actions) {
         $a = $_;
         my $f = $a->[0];
+        my ($pkg) = $a->[0] =~ /(.+)::.+/;
+        $pkg or
+            return [400, "action #$i: please supply qualified function name"];
+
         $res = $f->(%{$a->[1]},
                     -tx_action=>'check_state',
                     -tx_v=>2,
@@ -39,7 +43,11 @@ sub use_other_actions {
         if ($res->[0] == 200) {
             $has_fixable++;
             push @do, $a;
-            unshift @undo, @{ $res->[3]{undo_actions} };
+            my $uu = $res->[3]{undo_actions};
+            for my $u (@$uu) {
+                $u->[0] = "$pkg\::$u->[0]" unless $u->[0] =~ /::/;
+            }
+            unshift @undo, @$uu;
         } elsif ($res->[0] == 304) {
             # fixed
         } elsif ($res->[0] == 412) {
