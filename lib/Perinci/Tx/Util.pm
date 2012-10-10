@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Perinci::Sub::Util qw(wrapres);
+use UUID::Random;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -27,8 +28,14 @@ sub use_other_actions {
     for (@$actions) {
         $a = $_;
         my $f = $a->[0];
-        $res = $f->(%{$a->[1]}, -tx_action=>'check_state', -tx_v=>2);
-        # XXX some function needs -tx_action_id
+        $res = $f->(%{$a->[1]},
+                    -tx_action=>'check_state',
+                    -tx_v=>2,
+                    # it's okay to use random here, when tm records undo data it
+                    # will record by calling actions in do_actions directly, not
+                    # using our undo data
+                    -tx_action_id=>UUID::Random::generate(),
+                );
         if ($res->[0] == 200) {
             $has_fixable++;
             push @do, $a;
