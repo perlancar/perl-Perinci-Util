@@ -1,5 +1,14 @@
 Revision history for Perinci-Util
 
+0.31     2012-10-10 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - wrapres(): Tweak message
+
+         - Add module: Perinci::Tx::Util.
+
+
 0.30     2012-09-27 (SHARYANTO)
 
          [ENHANCEMENTS]
