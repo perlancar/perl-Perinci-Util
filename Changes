@@ -1,5 +1,13 @@
 Revision history for Perinci-Util
 
+0.32     2012-11-02 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Perinci::Sub::Util: Add caller() (moved from Perinci::Sub::Wrapper,
+           actually).
+
+
 0.31     2012-10-10 (SHARYANTO)
 
          [ENHANCEMENTS]
