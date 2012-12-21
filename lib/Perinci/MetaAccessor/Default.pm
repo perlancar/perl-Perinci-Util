@@ -30,3 +30,13 @@ sub set_meta {
 
 1;
 # ABSTRACT: Default class to access metadata in local package
+
+=head1 METHODS
+
+=head2 get_meta
+
+=head2 get_all_metas
+
+=head2 set_meta
+
+=cut

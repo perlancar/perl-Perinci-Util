@@ -1,5 +1,11 @@
 Revision history for Perinci-Util
 
+0.33     2012-12-21 (SHARYANTO)
+
+         Split into Perinci::Sub::{Dep,Function,Property}Util to avoid circular
+         dependency problem [RT #81999].
+
+
 0.32     2012-11-02 (SHARYANTO)
 
          [ENHANCEMENTS]
