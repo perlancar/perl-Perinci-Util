@@ -10,62 +10,12 @@ use SHARYANTO::Package::Util qw(package_exists);
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
-                       declare_property
                        declare_function_feature
                        declare_function_dep
                        get_package_meta_accessor
                );
 
 # VERSION
-
-sub declare_property {
-    my %args   = @_;
-    my $name   = $args{name}   or die "Please specify property's name";
-    my $schema = $args{schema} or die "Please specify property's schema";
-    my $type   = $args{type};
-
-    my $bs; # base schema (Rinci::metadata)
-    my $ts; # per-type schema (Rinci::metadata::TYPE)
-    my $bpp;
-    my $tpp;
-
-    require Rinci::Schema;
-    $bs = $Rinci::Schema::base;
-    $bpp = $bs->[1]{"keys"}
-        or die "BUG: Schema structure changed (1)";
-    $bpp->{$name}
-        and die "Property '$name' is already declared in base schema";
-    if ($type) {
-        if ($type eq 'function') {
-            $ts = $Rinci::Schema::function;
-        } elsif ($type eq 'variable') {
-            $ts = $Rinci::Schema::variable;
-        } elsif ($type eq 'package') {
-            $ts = $Rinci::Schema::package;
-        } else {
-            die "Unknown/unsupported property type: $type";
-        }
-        $tpp = $ts->[1]{"[merge+]keys"}
-            or die "BUG: Schema structure changed (1)";
-        $tpp->{$name}
-            and die "Property '$name' is already declared in $type schema";
-    }
-    ($bpp // $tpp)->{$name} = $schema;
-
-    {
-        require Perinci::Sub::Wrapper;
-        no strict 'refs';
-        if ($args{wrapper}) {
-            *{"Perinci::Sub::Wrapper::handlemeta_$name"} =
-                sub { $args{wrapper}{meta} };
-            *{"Perinci::Sub::Wrapper::handle_$name"} =
-                $args{wrapper}{handler};
-        } else {
-            *{"Perinci::Sub::Wrapper::handlemeta_$name"} =
-                sub { {} };
-        }
-    }
-}
 
 sub declare_function_feature {
     my %args   = @_;
@@ -156,8 +106,6 @@ It should be split once it's rather big.
 
 
 =head1 FUNCTIONS
-
-=head2 declare_property
 
 =head2 declare_function_dep
 
