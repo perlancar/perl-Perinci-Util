@@ -1,9 +1,18 @@
 Revision history for Perinci-Util
 
+0.34     2013-08-12 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Default meta accessor: allow customizing variable name (from %SPEC to
+           something else). Allow using object methods as well as static
+           methods.
+
+
 0.33     2012-12-21 (SHARYANTO)
 
-         Split into Perinci::Sub::{Dep,Function,Property}Util to avoid circular
-         dependency problem [RT #81999].
+         - Split into Perinci::Sub::{Dep,Function,Property}Util to avoid
+           circular dependency problem [RT #81999].
 
 
 0.32     2012-11-02 (SHARYANTO)
@@ -53,7 +62,7 @@ Revision history for Perinci-Util
 
 0.27     2012-09-07 (SHARYANTO)
 
-         No functional changes. Update dependencies version.
+         - No functional changes. Update dependencies version.
 
 
 0.26     2012-08-02 (SHARYANTO)
@@ -77,5 +86,5 @@ Revision history for Perinci-Util
 
 0.01     2012-08-01 (SHARYANTO)
 
-         First release. Split from Perinci to avoid circular dependency with
-         Perinci-Sub-Wrapper.
+         - First release. Split from Perinci to avoid circular dependency with
+           Perinci-Sub-Wrapper.
