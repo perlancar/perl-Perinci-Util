@@ -1,35 +1,38 @@
 package Perinci::MetaAccessor::Default;
 
-use 5.010;
+use 5.010001;
 use Moo;
 with 'Perinci::Role::MetaAccessor';
 
 # VERSION
 
+our $Default_Var = 'SPEC';
+
 sub new {
     my ($class, %args) = @_;
-    $args{var} //= 'SPEC';
+    $args{var} //= $Default_Var;
+    bless \%args, $class;
 }
 
 sub get_meta {
-    my ($self, $package, $leaf) = @_;
+    my ($soc, $package, $leaf) = @_; # soc = self_or_class
     my $key = $leaf || ':package';
     no strict 'refs';
     no warnings;
-    ${ "$package\::$self->{var}" }{$key};
+    ${ "$package\::" . (ref($soc) ? $soc->{var} : $Default_Var) }{$key};
 }
 
 sub get_all_metas {
-    my ($self, $package) = @_;
+    my ($soc, $package) = @_;
     no strict 'refs';
-    \%{ "$package\::$self->{var}" };
+    \%{ "$package\::" . (ref($soc) ? $soc->{var} : $Default_Var) };
 }
 
 sub set_meta {
-    my ($self, $package, $leaf, $meta) = @_;
+    my ($soc, $package, $leaf, $meta) = @_;
     no strict 'refs';
     my $key = $leaf || ':package';
-    ${ "$package\::$self->{var}" }{$key} = $meta;
+    ${ "$package\::" . (ref($soc) ? $soc->{var}:"SPEC") }{$key} = $meta;
 }
 
 1;
@@ -86,8 +89,14 @@ Constructor.
 
 =head2 $ma->get_meta($package, $leaf) => HASH
 
+Can also be accessed as a static method.
+
 =head2 $ma->get_all_metas($package) => HASH OF HASH
 
+Can also be accessed as a static method.
+
 =head2 $ma->set_meta($package, $leaf, $metadata)
+
+Can also be accessed as a static method.
 
 =cut
