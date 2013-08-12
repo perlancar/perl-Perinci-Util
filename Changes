@@ -1,5 +1,16 @@
 Revision history for Perinci-Util
 
+0.35     2013-08-12 (SHARYANTO)
+
+         [REMOVED FEATURES, INCOMPATIBLE CHANGES]
+
+         - Remove Perinci::MetaAccessor and $PERINCI_META_ACCESSOR for
+           simplicity. Now embedded metadata always assumed to reside in %SPEC
+           variable; more standardized is good. For cases where we need to
+           retrieve metadata externally, this will be handled by
+           Perinci::Access::InProcess.
+
+
 0.34     2013-08-12 (SHARYANTO)
 
          [ENHANCEMENTS]
