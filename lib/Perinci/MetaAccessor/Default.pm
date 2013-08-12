@@ -1,19 +1,3 @@
-package Perinci::MetaAccessor::Default;
-
-use 5.010001;
-use Moo;
-with 'Perinci::Role::MetaAccessor';
-
-# VERSION
-
-our $Default_Var = 'SPEC';
-
-sub new {
-    my ($class, %args) = @_;
-    $args{var} //= $Default_Var;
-    bless \%args, $class;
-}
-
 sub get_meta {
     my ($soc, $package, $leaf) = @_; # soc = self_or_class
     my $key = $leaf || ':package';
