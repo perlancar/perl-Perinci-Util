@@ -75,7 +75,7 @@ test_err(
 }
 
 {
-    local %INC;
+    local %INC = %INC;
     $INC{"Carp/Always.pm"} = "test";
     my $res1;
     test_err(

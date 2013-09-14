@@ -11,6 +11,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        err
                        caller
+                       wrapres
                );
 
 # VERSION
@@ -18,7 +19,7 @@ our @EXPORT_OK = qw(
 sub err {
 
     # get information about caller
-    my @caller = caller(1);
+    my @caller = CORE::caller(1);
     if (!@caller) {
         # probably called from command-line (-e)
         @caller = ("main", "-e", 1, "program");
@@ -60,7 +61,7 @@ sub err {
                         $prev->[3]{logs}[0]{stack_trace};
             $stack_trace = [];
             my $i = 1;
-            while (my @c = caller($i)) {
+            while (my @c = CORE::caller($i)) {
                 push @$stack_trace, \@c;
                 $i++;
             }
@@ -125,7 +126,7 @@ sub wrapres {
     my $build_es = $ENV{PERINCI_ERROR_STACK} || $Perinci::ERROR_STACK;
     if (!$build_es) {
         no strict 'refs';
-        my @c = caller(0);
+        my @c = CORE::caller(0);
         $build_es ||= ${"$c[0]::PERINCI_ERROR_STACK"};
     }
 
