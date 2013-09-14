@@ -103,8 +103,45 @@ sub caller {
     return defined($n0) ? @r : $r[0];
 }
 
+sub wrapres {
+    my ($ores, $ires) = @_;
+
+    $ores //= [];
+    my $istatus;
+    unless (defined $ores->[0]) {
+        $ores->[0] = $ires->[0];
+        $istatus++;
+    }
+    if ($ores->[1] && $ores->[1] =~ /: \z/) {
+        $ores->[1] .= $istatus ? $ires->[1] : "$ires->[0] - $ires->[1]";
+    } else {
+        $ores->[1] //= $ires->[1];
+    }
+    if (defined($ires->[2]) || @$ires > 2) {
+        $ores->[2] //= $ires->[2];
+    }
+
+    # should we build error stack?
+    my $build_es = $ENV{PERINCI_ERROR_STACK} || $Perinci::ERROR_STACK;
+    if (!$build_es) {
+        no strict 'refs';
+        my @c = caller(0);
+        $build_es ||= ${"$c[0]::PERINCI_ERROR_STACK"};
+    }
+
+    if ($build_es) {
+        $ores->[3] //= {};
+        $ores->[3]{error_stack} //= $ires->[3]{error_stack};
+        unshift @{ $ores->[3]{error_stack} }, $ires;
+    }
+
+    $ores;
+}
+
 1;
 # ABSTRACT: Helper when writing functions
+
+=for Pod::Coverage ^(wrapres)$
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,15 @@
 Revision history for Perinci-Util
 
-0.36     2013-09-13 (SHARYANTO) (not yet released)
+0.36     2013-09-15 (SHARYANTO) (not yet released)
 
          - Sub::Util: Add err().
 
-         [REMOVED FEATURES]
+         [DEPRECATION]
 
-         - Sub::Util: Remove wrapres() (I hate the interface, nobody is using it
-           except for my modules). See err() for replacement, since 99% of
-           use-case is to produce error response.
+         - Sub::Util: Remove wrapres() is now deprecated (I hate the interface,
+           nobody is using it except for my modules). See err() for replacement,
+           since 99% of use-case is to produce error response. It will be
+           removed in future releases.
 
 
 0.35     2013-08-12 (SHARYANTO)
