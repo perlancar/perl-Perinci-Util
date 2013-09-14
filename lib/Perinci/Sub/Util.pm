@@ -4,48 +4,79 @@ use 5.010;
 use strict;
 use warnings;
 
+use Scalar::Util qw (looks_like_number);
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
-                       wrapres
+                       err
                        caller
                );
 
 # VERSION
 
-sub wrapres {
-    my ($ores, $ires) = @_;
+sub err {
 
-    $ores //= [];
-    my $istatus;
-    unless (defined $ores->[0]) {
-        $ores->[0] = $ires->[0];
-        $istatus++;
-    }
-    if ($ores->[1] && $ores->[1] =~ /: \z/) {
-        $ores->[1] .= $istatus ? $ires->[1] : "$ires->[0] - $ires->[1]";
-    } else {
-        $ores->[1] //= $ires->[1];
-    }
-    if (defined($ires->[2]) || @$ires > 2) {
-        $ores->[2] //= $ires->[2];
+    # get information about caller
+    my @caller = caller(1);
+    if (!@caller) {
+        # probably called from command-line (-e)
+        @caller = ("main", "-e", 1, "program");
     }
 
-    # should we build error stack?
-    my $build_es = $ENV{PERINCI_ERROR_STACK} || $Perinci::ERROR_STACK;
-    if (!$build_es) {
-        no strict 'refs';
-        my @c = caller(0);
-        $build_es ||= ${"$c[0]::PERINCI_ERROR_STACK"};
+    my ($status, $msg, $meta, $prev);
+
+    for (@_) {
+        my $ref = ref($_);
+        if ($ref eq 'ARRAY') { $prev = $_ }
+        elsif ($ref eq 'HASH') { $meta = $_ }
+        elsif (!$ref) {
+            if (looks_like_number($_)) {
+                $status = $_;
+            } else {
+                $msg = $_;
+            }
+        }
     }
 
-    if ($build_es) {
-        $ores->[3] //= {};
-        $ores->[3]{error_stack} //= $ires->[3]{error_stack};
-        unshift @{ $ores->[3]{error_stack} }, $ires;
+    $status //= 500;
+    $msg  //= "$caller[3] failed";
+    $meta //= {};
+    $meta->{prev} //= $prev if $prev;
+
+    # put information on who produced this error and where/when
+    if (!$meta->{logs}) {
+
+        # should we produce a stack trace?
+        my $stack_trace;
+        {
+            no warnings;
+            # we use Carp::Always as a sign that user wants stack traces
+            last unless $INC{"Carp/Always.pm"};
+            # stack trace is already there in previous result's log
+            last if $prev && ref($prev->[3]) eq 'HASH' &&
+                ref($prev->[3]{logs}) eq 'ARRAY' &&
+                    ref($prev->[3]{logs}[0]) eq 'HASH' &&
+                        $prev->[3]{logs}[0]{stack_trace};
+            $stack_trace = [];
+            my $i = 1;
+            while (my @c = caller($i)) {
+                push @$stack_trace, \@c;
+                $i++;
+            }
+        }
+        push @{ $meta->{logs} }, {
+            type    => 'create',
+            time    => time(),
+            package => $caller[0],
+            file    => $caller[1],
+            line    => $caller[2],
+            func    => $caller[3],
+            ( stack_trace => $stack_trace ) x !!$stack_trace,
+        };
     }
 
-    $ores;
+    [$status, $msg, undef, $meta];
 }
 
 sub caller {
@@ -77,7 +108,7 @@ sub caller {
 
 =head1 SYNOPSIS
 
- use Perinci::Sub::Util qw(wrapres caller);
+ use Perinci::Sub::Util qw(err caller);
 
  sub foo {
      my %args = @_;
@@ -85,10 +116,8 @@ sub caller {
 
      my $caller = caller();
 
-     $res = bar(); # call another function
-     return wrapres([500, "Can't bar: "], $res) unless $res->[0] == 200;
-     $res = baz();
-     return wrapres([500, "Can't baz: "], $res) unless $res->[0] == 200;
+     $res = bar(...);
+     return err($err, 500, "Can't foo") if $res->[0] != 200;
 
      [200, "OK"];
  }
@@ -102,43 +131,38 @@ Just like Perl's builtin caller(), except that this one will ignore wrapper code
 in the call stack. You should use this if your code is potentially wrapped. See
 L<Perinci::Sub::Wrapper> for more details.
 
-=head2 wrapres([$status, $msg, $result, $meta], $res) => ARRAY
+=head2 err(...) => ARRAY
 
-Generate an envelope response based on an existing $res, with an option to build
-an error stack. Usually used to create an error response which preserves inner
-error.
+Experimental.
 
-If C<$status> is undefined, will use C<$res>'s status.
+Generate an enveloped error response (see L<Rinci::function>). Can accept
+arguments in an unordered fashion, by utilizing the fact that status codes are
+always integers, messages are strings, result metadata are hashes, and previous
+error responses are arrays. Error responses also seldom contain actual result.
+Status code defaults to 500, status message will default to "FUNC failed". This
+function will also fill the information in the C<logs> result metadata.
 
-If C<$message> is undefined, will use C<$res>'s message. If C<$message> ends
-with C</:\s?\z/>, will append C<$res>'s message.
+Examples:
 
-If C<$result> is undefined, will use C<$res>'s result.
+ err();    # => [500, "FUNC failed", undef, {...}];
+ err(404); # => [404, "FUNC failed", undef, {...}];
+ err(404, "Not found"); # => [404, "Not found", ...]
+ err("Not found", 404); # => [404, "Not found", ...]; # order doesn't matter
+ err([404, "Prev error"]); # => [500, "FUNC failed", undef,
+                           #     {logs=>[...], prev=>[404, "Prev error"]}]
 
-If C<$meta> is undefined, empty default is used. If instructed to build an error
-stack, will append C<$res> to result metadata's C<error_stack>.
+Will put C<stack_trace> in logs only if C<Carp::Always> module is loaded.
 
-Error stack by default is off. Can be turned on via setting global variable
-C<$Perinci::ERROR_STACK> to true value, or environment variable
-L<PERINCI_ERROR_STACK>, or package variables $PACKAGE::PERINCI_ERROR_STACK (to
-turn on on a package basis).
 
-Some examples (C<$res> is assumed to be C<< [404, "not found"] >>:
+=head1 FAQ
 
- wrapres(undef, $res);
- # when error stack is off: [404, "not found"]
- # when error stack is on : [404, "not found", undef,
- #                          {error_stack=>[404, "not found"]}]
+=head2 What if I want to put result ($res->[2]) into my result with err()?
 
- wrapres([undef, "can't select user: "], $res);
- # when error stack is off: [404, "can't select user: 404 - not found"]
- # when error stack is on : [405, "can't select user: 404 - not found", undef,
-                             {error_stack=>[404, "not found"]}]
+You can do something like this:
 
- wrapres([500, "can't select user", -1, {foo=>1}], $res);
- # when error stack is off: [500, "can't select user"]
- # when error stack is on : [500, "can't select user", -1,
-                             {foo=>1, error_stack=>[404, "not found"]}]
+ my $err = err(...) if ERROR_CONDITION;
+ $err->[2] = SOME_RESULT;
+ return $err;
 
 
 =head1 SEE ALSO
