@@ -104,6 +104,7 @@ sub caller {
     return defined($n0) ? @r : $r[0];
 }
 
+# DEPRECATED since 2013-09-15: no longer documented and to remove later
 sub wrapres {
     my ($ores, $ires) = @_;
 
