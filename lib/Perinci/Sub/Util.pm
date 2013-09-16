@@ -69,11 +69,11 @@ sub err {
                     package DB;
                     @_c = CORE::caller($_i);
                     if (@_c) {
-                        $_c[4] = \@DB::args;
+                        $_c[4] = [@DB::args];
                     }
                 }
                 last unless @_c;
-                push @$stack_trace, \@_c;
+                push @$stack_trace, [@_c];
                 $_i++;
             }
         }
