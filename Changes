@@ -1,5 +1,10 @@
 Revision history for Perinci-Util
 
+0.37     2013-09-16 (SHARYANTO)
+
+         - Put caller arguments into stack trace.
+
+
 0.36     2013-09-15 (SHARYANTO)
 
          - Sub::Util: Add err().
