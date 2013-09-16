@@ -16,6 +16,9 @@ our @EXPORT_OK = qw(
 
 # VERSION
 
+our @_c; # to store temporary celler() result
+our $_i; # temporary variable
+
 sub err {
 
     # get information about caller
@@ -60,10 +63,18 @@ sub err {
                     ref($prev->[3]{logs}[0]) eq 'HASH' &&
                         $prev->[3]{logs}[0]{stack_trace};
             $stack_trace = [];
-            my $i = 1;
-            while (my @c = CORE::caller($i)) {
-                push @$stack_trace, \@c;
-                $i++;
+            $_i = 1;
+            while (1) {
+                {
+                    package DB;
+                    @_c = CORE::caller($_i);
+                    if (@_c) {
+                        $_c[4] = \@DB::args;
+                    }
+                }
+                last unless @_c;
+                push @$stack_trace, \@_c;
+                $_i++;
             }
         }
         push @{ $meta->{logs} }, {
