@@ -1,16 +1,5 @@
 Revision history for Perinci-Util
 
-0.38     2013-09-19 (SHARYANTO) (not yet released)
-
-         [REMOVED FEATURES]
-
-         - Remove function: wrapres().
-
-         [ETC]
-
-         - Experiment using version::Limit to break users of old code (0.37-)
-
-
 0.37     2013-09-16 (SHARYANTO)
 
          - Put caller arguments into stack trace.
