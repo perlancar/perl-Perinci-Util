@@ -16,6 +16,11 @@ our @EXPORT_OK = qw(
 
 # VERSION
 
+use version::Limit qw();
+version::Limit::Scope(
+    "[0.0,0.37]" => "wrapres() has been removed",
+);
+
 our @_c; # to store temporary celler() result
 our $_i; # temporary variable
 
