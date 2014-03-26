@@ -15,6 +15,8 @@ our @EXPORT_OK = qw(
 
 # VERSION
 
+our $STACK_TRACE;
+
 our @_c; # to store temporary celler() result
 our $_i; # temporary variable
 
@@ -55,7 +57,7 @@ sub err {
         {
             no warnings;
             # we use Carp::Always as a sign that user wants stack traces
-            last unless $INC{"Carp/Always.pm"};
+            last unless $STACK_TRACE // $INC{"Carp/Always.pm"};
             # stack trace is already there in previous result's log
             last if $prev && ref($prev->[3]) eq 'HASH' &&
                 ref($prev->[3]{logs}) eq 'ARRAY' &&
@@ -87,6 +89,7 @@ sub err {
         };
     }
 
+    #die;
     [$status, $msg, undef, $meta];
 }
 
